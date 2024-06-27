@@ -1,0 +1,43 @@
+[
+	{
+		"_id": "5f3f4b3b9b3b3b3b3b3b3b3b",
+		"createdAt": "2020-08-20T00:00:00.000Z",
+		"text": "composed",
+		"message": {
+			"items": [
+				{
+				"content": {
+					"type":"text",
+					"text":"Hello 1"
+				},
+				"type": "text"
+			},
+			{
+				"content": {
+					"type":"text",
+					"text":"Hello 2"
+				},
+				"type": "text"
+			},
+			{
+				"content": {
+					"type":"text",
+					"text":"Hello 3"
+				},
+				"type": "text"
+			},
+			{
+				"content": {
+					"type":"text",
+					"text":"Hello 4"
+				},
+				"type": "text"
+			}
+			],
+			"user": {
+				"_id": "5f3f4b3b9b3b3b3b3b3b3b3b",
+				"name": "Bashful"
+			}
+		}
+	}
+]

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -12,10 +11,15 @@ import { debounce } from "lodash";
 
 import FlatListItem from "./components/FlatListItem";
 
+const ITEMS_PER_PAGE = 12;
+
 export default function App() {
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [viewableItems, setViewableItems] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [lastPage, setLastPage] = useState(0);
+  const [messageData, setMessageData] = useState([]);
   const flatListRef = useRef(null);
 
   const handleViewableItemsChanged = useCallback(
@@ -26,25 +30,56 @@ export default function App() {
   );
 
   useEffect(() => {
-    // Fetch messages
+    // Load initial messages
+    const loadInitialMessages = async () => {
+      const md = require("./data/messages.json");
+      console.log("Initial messages loaded...", md.length);
+
+      const newMessages = md.slice(0, ITEMS_PER_PAGE);
+      setMessages(newMessages);
+
+      setMessageData(md);
+      const totalPages = Math.ceil(md.length / ITEMS_PER_PAGE);
+      console.log("Total pages", totalPages);
+      setLastPage(totalPages);
+      setCurrentPage(1);
+    };
+    loadInitialMessages();
   }, []);
+
+  const loadMessages = () => {
+    //if (currentPage >= lastPage) return;
+
+    setLoading(true);
+    const start = currentPage * ITEMS_PER_PAGE;
+    console.log("start ", start);
+    const end = start + ITEMS_PER_PAGE;
+    console.log("end ", end);
+    const newMessages = messageData.slice(start, end);
+    console.log(
+      "first id",
+      newMessages[0]._id,
+      "last id",
+      newMessages[newMessages.length - 1]._id
+    );
+    console.log("Loading more messages...", newMessages);
+
+    setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+    setCurrentPage((prevPage) => prevPage + 1);
+    setLoading(false);
+  };
 
   const loadMoreMessages = useCallback(() => {
-    // Fetch more messages
-  }, []);
+    if (loading) return;
+    loadMessages();
+  }, [loading]);
 
   const renderItem = useCallback(
-    ({ item, index }) => (
-      <FlatListItem
-        message={item}
-        index={index}
-        //  isViewable={viewableItems.includes(item.id) && isFocused}
-      />
-    ),
+    ({ item, index }) => <FlatListItem message={item} index={index} />,
     []
   );
 
-  const keyExtractor = useCallback((item) => item.id, []);
+  const keyExtractor = useCallback((item) => item._id, []);
 
   return (
     <SafeAreaView style={styles.container}>

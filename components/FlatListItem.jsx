@@ -71,7 +71,7 @@ const FlatListItem = memo(
     }, [message]);
 
     const renderPreview = () => {
-      console.log("renderPreview", index);
+      //console.log("renderPreview", index);
       switch (data.type) {
         case "symbol":
           return (
@@ -139,15 +139,15 @@ const FlatListItem = memo(
     );
   },
   (prevProps, nextProps) => {
-    console.log(
-      "TestNavigatorPreview memo",
-      prevProps.message.id,
-      nextProps.message.id,
-      prevProps.index,
-      nextProps.index
-    );
+    // console.log(
+    //   "TestNavigatorPreview memo",
+    //   prevProps.message._id,
+    //   nextProps.message._id,
+    //   prevProps.index,
+    //   nextProps.index
+    // );
     return (
-      prevProps.message.id === nextProps.message.id &&
+      prevProps.message._id === nextProps.message._id &&
       prevProps.index === nextProps.index
     );
   }

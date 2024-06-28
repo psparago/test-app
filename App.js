@@ -24,7 +24,7 @@ export default function App() {
 
   const handleViewableItemsChanged = useCallback(
     debounce(({ viewableItems }) => {
-      setViewableItems(viewableItems.map((item) => item.item.id));
+      setViewableItems(viewableItems.map((item) => item.item._id));
     }, 100),
     []
   );
@@ -32,40 +32,62 @@ export default function App() {
   useEffect(() => {
     // Load initial messages
     const loadInitialMessages = async () => {
-      const md = require("./data/messages.json");
-      console.log("Initial messages loaded...", md.length);
+      setLoading(true);
+      try {
+        const md = require("./data/messages.json");
+        console.log("Initial messages loaded...", md.length);
 
-      const newMessages = md.slice(0, ITEMS_PER_PAGE);
-      setMessages(newMessages);
+        const newMessages = md.slice(0, ITEMS_PER_PAGE);
+        setMessages(newMessages);
 
-      setMessageData(md);
-      const totalPages = Math.ceil(md.length / ITEMS_PER_PAGE);
-      console.log("Total pages", totalPages);
-      setLastPage(totalPages);
-      setCurrentPage(1);
+        setMessageData(md);
+        const totalPages = Math.ceil(md.length / ITEMS_PER_PAGE);
+        console.log("Total pages", totalPages);
+        setLastPage(totalPages);
+        setCurrentPage(1);
+      } finally {
+        setLoading(false);
+      }
     };
     loadInitialMessages();
+    return () => {
+      console.log("cleaning up...");
+      setMessageData([]);
+      setMessages([]);
+      setViewableItems([]);
+      setCurrentPage(0);
+      setLastPage(0);
+    };
   }, []);
 
   const loadMessages = () => {
+    console.log("loading more pages...", currentPage, lastPage);
+    if (loading) return;
     //if (currentPage >= lastPage) return;
 
     setLoading(true);
-    const start = currentPage * ITEMS_PER_PAGE;
-    console.log("start ", start);
-    const end = start + ITEMS_PER_PAGE;
-    console.log("end ", end);
-    const newMessages = messageData.slice(start, end);
-    console.log(
-      "first id",
-      newMessages[0]._id,
-      "last id",
-      newMessages[newMessages.length - 1]._id
-    );
-    console.log("Loading more messages...", newMessages);
+    try {
+      const start = currentPage * ITEMS_PER_PAGE;
+      console.log("start ", start);
+      const end = start + ITEMS_PER_PAGE;
+      console.log("end ", end);
+      const newMessages = messageData.slice(start, end);
+      // console.log(
+      //   "first id",
+      //   newMessages[0]._id,
+      //   "last id",
+      //   newMessages[newMessages.length - 1]._id
+      // );
+      console.log("Loaded more messages...", newMessages.length);
+      for (let i = 0; i < newMessages.length; i++) {
+        console.log(newMessages[i]._id);
+      }
+      setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+      setCurrentPage((prevPage) => prevPage + 1);
+    } finally {
+      setLoading(false);
+    }
 
-    setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-    setCurrentPage((prevPage) => prevPage + 1);
     setLoading(false);
   };
 

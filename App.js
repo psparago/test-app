@@ -35,14 +35,12 @@ export default function App() {
       setLoading(true);
       try {
         const md = require("./data/messages.json");
-        console.log("Initial messages loaded...", md.length);
 
         const newMessages = md.slice(0, ITEMS_PER_PAGE);
         setMessages(newMessages);
 
         setMessageData(md);
         const totalPages = Math.ceil(md.length / ITEMS_PER_PAGE);
-        console.log("Total pages", totalPages);
         setLastPage(totalPages);
         setCurrentPage(1);
       } finally {
@@ -51,7 +49,6 @@ export default function App() {
     };
     loadInitialMessages();
     return () => {
-      console.log("cleaning up...");
       setMessageData([]);
       setMessages([]);
       setViewableItems([]);
@@ -60,41 +57,25 @@ export default function App() {
     };
   }, []);
 
-  const loadMessages = () => {
-    console.log("loading more pages...", currentPage, lastPage);
-    if (loading) return;
-    //if (currentPage >= lastPage) return;
+  const loadMessages = useCallback(() => {
+    if (loading || currentPage >= lastPage) return;
 
     setLoading(true);
     try {
       const start = currentPage * ITEMS_PER_PAGE;
-      console.log("start ", start);
       const end = start + ITEMS_PER_PAGE;
-      console.log("end ", end);
       const newMessages = messageData.slice(start, end);
-      // console.log(
-      //   "first id",
-      //   newMessages[0]._id,
-      //   "last id",
-      //   newMessages[newMessages.length - 1]._id
-      // );
-      console.log("Loaded more messages...", newMessages.length);
-      for (let i = 0; i < newMessages.length; i++) {
-        console.log(newMessages[i]._id);
-      }
       setMessages((prevMessages) => [...prevMessages, ...newMessages]);
       setCurrentPage((prevPage) => prevPage + 1);
     } finally {
       setLoading(false);
     }
-
-    setLoading(false);
-  };
+  }, [loading, currentPage, lastPage, messageData]);
 
   const loadMoreMessages = useCallback(() => {
     if (loading) return;
     loadMessages();
-  }, [loading]);
+  }, [loading, loadMessages]);
 
   const renderItem = useCallback(
     ({ item, index }) => <FlatListItem message={item} index={index} />,

@@ -8,7 +8,7 @@ const FlatListItem = memo(
 
     useEffect(() => {
       const findThumbnailItem = async () => {
-        console.log("findThumbnailItem", index);
+        // console.log("findThumbnailItem", index);
         // Support for simple text messages
         if (!message.message) {
           setData({ type: "text", data: {} });
@@ -78,7 +78,7 @@ const FlatListItem = memo(
     }, [message]);
 
     const renderPreview = () => {
-      console.log("renderPreview", index);
+      // console.log("renderPreview", index);
       switch (data.type) {
         case "symbol":
           return (
